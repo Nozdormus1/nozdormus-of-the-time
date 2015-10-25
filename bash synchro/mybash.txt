@@ -1,13 +1,13 @@
 #!/bin/bash
 #host variables
-host1="192.168.56.10"
+HOST1="192.168.56.10"
 #paths variables
 PATHM1=~/backup/hostdata1
 PATHLOGS=~/backup
 PATHHOST1="$1"
 CHECKPATH=${PATHHOST1##*/}
 #massives
-hostsmas=( "$host1" )
+hostsmas=( "$HOST1" )
 foldermymas=( "$PATHM1" )
 #cycle for multi copying
 for (( i=0; i<1; i++ ))
