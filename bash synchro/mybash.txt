@@ -1,0 +1,38 @@
+#!/bin/bash
+#host variables
+host1="192.168.56.10"
+#paths variables
+PATHM1=~/backup/hostdata1
+PATHHOST1="$1"
+CHECKPATH=${PATHHOST1##*/}
+#massives
+hostsmas=( "$host1" )
+foldermymas=( "$PATHM1" )
+#starting timer for 5 minutes allowed in background
+~/timer5 &
+#cycle for multi copying
+for (( i=0; i<1; i++ ))
+do
+	#Actually process of copying
+	scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]}
+	#Date of end of the copying
+	DATA=$(date)
+	#Checking weights and lists of copied files
+	SUMHOST1=$( rsh ${hostsmas[$i]} du -a $PATHHOST1 |cut -f1 )
+	SUMM1=$( du -a ${foldermymas[$i]}/$CHECKPATH |cut -f1 )
+	if [ -d $1 ]
+	then
+		LISTHOST1=$( rsh ${hostsmas[$i]} ls -a $PATHHOST1 )
+		LISTM1=$( ls -a ${foldermymas[$i]}/$CHECKPATH )
+	else
+		LISTHOST1=1
+		LISTM1=1
+	fi
+	#Information sends to log file in ~/backup/
+	if [ "$LISTHOST1" = "$LISTM1" ] && [ "$SUMHOST1" = "$SUMM1" ]
+	then
+		echo "$DATA	Host ${hostsmas[$i]} : copying done!" >> ~/backup/log
+	else
+		echo "$DATA	Host ${hostsmas[$i]} : copying done with error: some copied files are corrupted or do not exist!" >> ~/backup/log
+	fi
+done

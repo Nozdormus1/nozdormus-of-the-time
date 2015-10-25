@@ -1,0 +1,14 @@
+#!/bin/bash
+while [ 1 = 1 ]
+do 
+	if pgrep "mybash" > /dev/null
+	then
+		if [ $SECONDS -gt 300 ]
+		then
+			pkill -f mybash
+			break
+		fi
+	else
+		break
+	fi
+done
