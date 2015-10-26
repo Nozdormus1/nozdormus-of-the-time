@@ -6,8 +6,6 @@ PATHM1=~/backup/hostdata1
 PATHLOGS=~/backup 
 PATHHOST1="$1" 
 CHECKPATH=${PATHHOST1##*/} 
-#string
-LISTTAR=""
 #massives 
 hostsmas=( "$HOST1" ) 
 foldermymas=( "$PATHM1" ) 
@@ -16,8 +14,17 @@ for (( i=0; i<1; i++ ))
 do 
 	if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 	then 
-		LIST=$( rsh ${hostsmas[$i]} find $PATHHOST1/ -type d | sed 's/\home\/nozdormus\/synchro\///' )
-		for name in $LIST
+		#string
+		LISTTAR=""
+		LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1/ -type f )
+		LISTTO=""
+		PATHHOSTTMP=$PATHHOST1/
+		for inv in $LISTTMP
+		do
+			TMPL=${inv#*$PATHHOSTTMP}
+			LISTTO="$TMPL $LISTTO"
+		done
+		for name in $LISTTO
 		do
 			if [ -e ${foldermymas[$i]}/$name ]
 			then
@@ -44,8 +51,6 @@ do
 		SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
 		SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
 	fi 
-	#Killing timer proc, cuase copying was done 
-	pkill -f timer5 
 	#Date of end of the copying 
 	DATA=$(date) 
 	#Checking weights and lists of copied files 
