@@ -79,17 +79,17 @@ do
 	then 
 		if [[ `ssh ${hostsmas[$i]} test -e $PATHHOST1 && echo exists` ]]
 		then
-			echo "$DATA	Host ${hostsmas[$i]} : copying done!" >> $PATHLOGS/log 
+			echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log 
 			if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 			then 
-				if[ ! -z "$LISTTAR" ]
+				if [ ! -z "$LISTTAR" ]
 				then
 					#create emprty folders (for full synchro)
 					if [ ! -d ${foldermymas[$i]}/$CHECKPATH ] 
 					then 
 						mkdir ${foldermymas[$i]}/$CHECKPATH 
 					fi 
-					LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1/* -type d )
+					LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1 -type d )
 					LISTTO=""
 					PATHHOSTTMP=$PATHHOST1/
 					for inv in $LISTTMP
@@ -116,7 +116,7 @@ do
 			echo "$DATA	Host ${hostsmas[$i]} : error: no such file or directory exists" >> $PATHLOGS/log 
 		fi
 	else 
-		echo "$DATA	Host ${hostsmas[$i]} : copying done with error: some copied files are corrupted or do not exist!" >> $PATHLOGS/log 
+		echo "$DATA	Host ${hostsmas[$i]} : synchronizing done with error: some copied files are corrupted or do not exist!" >> $PATHLOGS/log 
 		if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 		then 
 			rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
