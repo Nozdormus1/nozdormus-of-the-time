@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 #host variables 
 HOST1="192.168.56.10" 
 #paths variables 
