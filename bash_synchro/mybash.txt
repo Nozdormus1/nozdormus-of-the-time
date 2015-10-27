@@ -110,41 +110,41 @@ do
 					tar xfP ${foldermymas[$i]}/$CHECKPATH\.tar -C ${foldermymas[$i]}/$CHECKPATH 
 					rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
 					rm ${foldermymas[$i]}/$CHECKPATH\.tar
-					#remove files and folder that doesn't exist in $1
-					LISTRMF=$( find ${foldermymas[$i]}/$CHECKPATH -type f )
-					LISTTORMF=""
-					MYPATHTMP=${foldermymas[$i]}/
-					for inv in $LISTRMF
-					do
-						TMPL=${inv#*$MYPATHTMP}
-						LISTTORMF="$TMPL $LISTTORMF"
-					done
-					for name in $LISTTORMF
-					do
-						if [[ `ssh ${hostsmas[$i]} test ! -e $PATHHOST1/$name && echo exists` ]] 
+				fi 
+				#remove files and folder that doesn't exist in $1
+				LISTRMF=$( find ${foldermymas[$i]}/$CHECKPATH -type f )
+				LISTTORMF=""
+				MYPATHTMP=${foldermymas[$i]}/
+				for inv in $LISTRMF
+				do
+					TMPL=${inv#*$MYPATHTMP}
+					LISTTORMF="$TMPL $LISTTORMF"
+				done
+				for name in $LISTTORMF
+				do
+					if [[ `ssh ${hostsmas[$i]} test ! -e $CHECKDIR/$name && echo exists` ]] 
+					then
+						rm ${foldermymas[$i]}/$name
+					fi
+				done
+				LISTRMD=$( find ${foldermymas[$i]}/$CHECKPATH -type d )
+				LISTTORMD=""
+				MYPATHTMP=${foldermymas[$i]}/
+				for inv in $LISTRMD
+				do
+					TMPL=${inv#*$MYPATHTMP}
+					LISTTORMD="$TMPL $LISTTORMD"
+				done
+				for name in $LISTTORMD
+				do
+					if [ $name != $CHECKPATH ]
+					then
+						if [[ `ssh ${hostsmas[$i]} test ! -d $CHECKDIR/$name && echo exists` ]]
 						then
 							rm ${foldermymas[$i]}/$name
 						fi
-					done
-					LISTRMD=$( find ${foldermymas[$i]}/$CHECKPATH -type d )
-					LISTTORMD=""
-					MYPATHTMP=${foldermymas[$i]}/
-					for inv in $LISTRMD
-					do
-						TMPL=${inv#*$MYPATHTMP}
-						LISTTORMD="$TMPL $LISTTORMD"
-					done
-					for name in $LISTTORMD
-					do
-						if [ $name != ${foldermymas[$i]}/$CHECKPATH ]
-						then
-							if [[ `ssh ${hostsmas[$i]} test ! -d $PATHHOST1/$name && echo exists` ]]
-							then
-								rm ${foldermymas[$i]}/$name
-							fi
-						fi
-					done
-				fi 
+					fi
+				done
 			fi 
 		else
 			if [ -e ${foldermymas[$i]}/$CHECKPATH ]
