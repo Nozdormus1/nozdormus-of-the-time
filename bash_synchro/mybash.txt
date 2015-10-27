@@ -84,33 +84,33 @@ do
 			then 
 				if [ ! -z "$LISTTAR" ]
 				then
-					#create empty folders (for full synchro)
-					if [ ! -d ${foldermymas[$i]}/$CHECKPATH ] 
-					then 
-						mkdir ${foldermymas[$i]}/$CHECKPATH 
-					fi 
-					LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1 -type d )
-					LISTTO=""
-					PATHHOSTTMP=$PATHHOST1/
-					for inv in $LISTTMP
-					do
-						TMPL=${inv#*$PATHHOSTTMP}
-						LISTTO="$TMPL $LISTTO"
-					done
-					for name in $LISTTO
-					do
-						if [ $name != $PATHHOST1 ]
-						then
-							if [ ! -d ${foldermymas[$i]}/$CHECKPATH/$name ]
-							then
-								mkdir -p ${foldermymas[$i]}/$CHECKPATH/$name
-							fi
-						fi
-					done
 					tar xfP ${foldermymas[$i]}/$CHECKPATH\.tar -C ${foldermymas[$i]}/$CHECKPATH 
 					rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
 					rm ${foldermymas[$i]}/$CHECKPATH\.tar
 				fi 
+				#create empty folders (for full synchro)
+				if [ ! -d ${foldermymas[$i]}/$CHECKPATH ] 
+				then 
+					mkdir ${foldermymas[$i]}/$CHECKPATH 
+				fi 
+				LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1 -type d )
+				LISTTO=""
+				PATHHOSTTMP=$PATHHOST1/
+				for inv in $LISTTMP
+				do
+					TMPL=${inv#*$PATHHOSTTMP}
+					LISTTO="$TMPL $LISTTO"
+				done
+				for name in $LISTTO
+				do
+					if [ $name != $PATHHOST1 ]
+					then
+						if [ ! -d ${foldermymas[$i]}/$CHECKPATH/$name ]
+						then
+							mkdir -p ${foldermymas[$i]}/$CHECKPATH/$name
+						fi
+					fi
+				done
 				#remove files and folder that doesn't exist in $1
 				LISTRMF=$( find ${foldermymas[$i]}/$CHECKPATH -type f )
 				LISTTORMF=""
@@ -141,7 +141,7 @@ do
 					then
 						if [[ `ssh ${hostsmas[$i]} test ! -d $CHECKDIR/$name && echo exists` ]]
 						then
-							rm ${foldermymas[$i]}/$name
+							rm -r ${foldermymas[$i]}/$name
 						fi
 					fi
 				done
