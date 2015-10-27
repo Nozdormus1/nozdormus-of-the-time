@@ -79,7 +79,6 @@ do
 	then 
 		if [[ `ssh ${hostsmas[$i]} test -e $PATHHOST1 && echo exists` ]]
 		then
-			echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log 
 			if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 			then 
 				if [ ! -z "$LISTTAR" ]
@@ -146,18 +145,12 @@ do
 					fi
 				done
 			fi 
+			echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log 
 		else
 			if [ -e ${foldermymas[$i]}/$CHECKPATH ]
 			then
-				rm ${foldermymas[$i]}/$CHECKPATH 
-				echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log
-			else
-				echo "$DATA	Host ${hostsmas[$i]} : error: no such file or directory exists" >> $PATHLOGS/log
-			fi
-			if [ -d ${foldermymas[$i]}/$CHECKPATH ]
-			then
 				rm -r ${foldermymas[$i]}/$CHECKPATH 
-				echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log
+				echo "$DATA	Host ${hostsmas[$i]} : synchronizing done! removed non-existent files in ${foldermymas[$i]}" >> $PATHLOGS/log
 			else
 				echo "$DATA	Host ${hostsmas[$i]} : error: no such file or directory exists" >> $PATHLOGS/log
 			fi
