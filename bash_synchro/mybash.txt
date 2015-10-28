@@ -10,8 +10,9 @@ PATHHOST1=$CHECKDIR/$CHECKPATH
 #massives 
 hostsmas=( "$HOST1" ) 
 foldermymas=( "$PATHM1" ) 
+sizeofmas=${#hostsmas[@]}
 #cycle for multi copying 
-for (( i=0; i<1; i++ )) 
+for (( i=0; i<$sizeofmas; i++ )) 
 do 
 	if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 	then 
@@ -43,12 +44,17 @@ do
 		if [ ! -z "$LISTTAR" ]
 		then
 			rsh ${hostsmas[$i]} tar cfP $PATHHOST1\.tar -C $PATHHOST1 $LISTTAR 
-			#starting timer for 5 minutes allowed in background 
-			~/timer5 & 
 			#Actually process of copying 
-			scp -pr ${hostsmas[$i]}:$PATHHOST1\.tar ${foldermymas[$i]} 
-			SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1\.tar | cut -f1 -d' ' ) 
-			SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH\.tar | cut -f1 -d' ' )
+			if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1\.tar ${foldermymas[$i]}
+			then 
+				SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1\.tar | cut -f1 -d' ' ) 
+				SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH\.tar | cut -f1 -d' ' )
+				FLAG=0
+			else
+				SUMHOST1=1
+				SUMM1=2
+				FLAG=1
+			fi
 		fi 
 	else 
 		if [[ `ssh ${hostsmas[$i]} test -e $PATHHOST1 && echo exists` ]]
@@ -59,16 +65,28 @@ do
 				SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
 				if [ $SUMHOST1 != $SUMM1 ]
 				then
-					~/timer5 & 
-					scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
-					SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
-					SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
+					if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
+					then
+						SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
+						SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
+						FLAG=0
+					else
+						SUMHOST1=1
+						SUMM1=2
+						FLAG=1
+					fi
 				fi
 			else
-				~/timer5 & 
-				scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
-				SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
-				SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
+				if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
+				then
+					SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
+					SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
+					FLAG=0
+				else
+					SUMHOST1=1
+					SUMM=2
+					FLAG=1
+				fi
 			fi
 		fi
 	fi 
@@ -147,16 +165,15 @@ do
 			fi 
 			echo "$DATA	Host ${hostsmas[$i]} : synchronizing done!" >> $PATHLOGS/log 
 		else
-			if [ -e ${foldermymas[$i]}/$CHECKPATH ]
-			then
-				rm -r ${foldermymas[$i]}/$CHECKPATH 
-				echo "$DATA	Host ${hostsmas[$i]} : synchronizing done! removed non-existent files in ${foldermymas[$i]}" >> $PATHLOGS/log
-			else
-				echo "$DATA	Host ${hostsmas[$i]} : error: no such file or directory exists" >> $PATHLOGS/log
-			fi
+			echo "$DATA	Host ${hostsmas[$i]} : error: no such file or directory exists" >> $PATHLOGS/log
 		fi
 	else 
-		echo "$DATA	Host ${hostsmas[$i]} : synchronizing done with error: some copied files are corrupted or do not exist!" >> $PATHLOGS/log 
+		if [ FLAG = 0 ]
+		then
+			echo "$DATA	Host ${hostsmas[$i]} : synchronizing done with error: some copied files are corrupted or do not exist!" >> $PATHLOGS/log 
+		else
+			echo "$DATA	Host ${hostsmas[$i]} : synchronizing failed: copying time was more than 5 mins" >> $PATHLOGS/log
+		fi 
 		if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 		then 
 			rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
