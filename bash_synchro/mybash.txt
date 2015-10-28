@@ -99,6 +99,10 @@ do
 		then
 			if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 			then 
+				if [ ! -d ${foldermymas[$i]}/$CHECKPATH ] 
+				then 
+					mkdir ${foldermymas[$i]}/$CHECKPATH 
+				fi 
 				if [ ! -z "$LISTTAR" ]
 				then
 					tar xfP ${foldermymas[$i]}/$CHECKPATH\.tar -C ${foldermymas[$i]}/$CHECKPATH 
@@ -106,10 +110,6 @@ do
 					rm ${foldermymas[$i]}/$CHECKPATH\.tar
 				fi 
 				#create empty folders (for full synchro)
-				if [ ! -d ${foldermymas[$i]}/$CHECKPATH ] 
-				then 
-					mkdir ${foldermymas[$i]}/$CHECKPATH 
-				fi 
 				LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1 -type d )
 				LISTTO=""
 				PATHHOSTTMP=$PATHHOST1/
