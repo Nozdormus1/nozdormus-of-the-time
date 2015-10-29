@@ -2,14 +2,9 @@
 #enter $1 as sensors, $2 as readings
 #for using command print ./doit.awk sensors readings
 #sensors and readings must be in the same folder, or just use full path for them
-#create variables with number of repetitions of single parameter
-for(( i=1; i<6; i++ ))
-do
-	count[i]=$( awk -F"/" '{if( $2 == "'$i'" ) a++ } END{print a}' $2 )
-done
 #doing some text manipulations
 awk -F"/" '
-{ print $2" "$3 } ' $2 | sort | \
+{ print $2" "$3 } ' $2 | \
 awk '
 {
 for (i=1; i<6; i++){
@@ -26,5 +21,5 @@ for (i=1; i<6; i++ ){
 }
 }
 ' >> 1.tmp
-join $1 1.tmp | awk '{printf $2" "$3}' | sort -t'	' -k2
+join $1 1.tmp | awk '{print $2"\t"$3}' | sort -t'	' -k2
 rm 1.tmp
