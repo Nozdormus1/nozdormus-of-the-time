@@ -18,7 +18,7 @@ do
 	then 
 		#check what file we need to copy
 		LISTTAR=""
-		LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1/ -type f )
+		LISTTMP=$( ssh ${hostsmas[$i]} find $PATHHOST1/ -type f )
 		LISTTO=""
 		PATHHOSTTMP=$PATHHOST1/
 		for inv in $LISTTMP
@@ -30,7 +30,7 @@ do
 		do
 			if [ -e ${foldermymas[$i]}/$CHECKPATH/$name ]
 			then
-				SUMMCH1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1/$name | cut -f1 -d' ' )
+				SUMMCH1=$( ssh ${hostsmas[$i]} md5sum $PATHHOST1/$name | cut -f1 -d' ' )
 				SUMMCH2=$( md5sum ${foldermymas[$i]}/$CHECKPATH/$name | cut -f1 -d' ' )
 				if [ $SUMMCH1 != $SUMMCH2 ]
 				then
@@ -43,11 +43,11 @@ do
 		#check the bug about empty archive
 		if [ ! -z "$LISTTAR" ]
 		then
-			rsh ${hostsmas[$i]} tar cfP $PATHHOST1\.tar -C $PATHHOST1 $LISTTAR 
+			ssh ${hostsmas[$i]} tar cfP $PATHHOST1\.tar -C $PATHHOST1 $LISTTAR 
 			#Actually process of copying 
 			if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1\.tar ${foldermymas[$i]}
 			then 
-				SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1\.tar | cut -f1 -d' ' ) 
+				SUMHOST1=$( ssh ${hostsmas[$i]} md5sum $PATHHOST1\.tar | cut -f1 -d' ' ) 
 				SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH\.tar | cut -f1 -d' ' )
 				FLAG=0
 			else
@@ -61,13 +61,13 @@ do
 		then
 			if [ -e ${foldermymas[$i]}/$CHECKPATH ]
 			then
-				SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
+				SUMHOST1=$( ssh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
 				SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
 				if [ $SUMHOST1 != $SUMM1 ]
 				then
 					if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
 					then
-						SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
+						SUMHOST1=$( ssh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
 						SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
 						FLAG=0
 					else
@@ -79,7 +79,7 @@ do
 			else
 				if timeout 300 scp -pr ${hostsmas[$i]}:$PATHHOST1 ${foldermymas[$i]} 
 				then
-					SUMHOST1=$( rsh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
+					SUMHOST1=$( ssh ${hostsmas[$i]} md5sum $PATHHOST1 | cut -f1 -d' ' ) 
 					SUMM1=$( md5sum ${foldermymas[$i]}/$CHECKPATH | cut -f1 -d' ' ) 
 					FLAG=0
 				else
@@ -106,11 +106,11 @@ do
 				if [ ! -z "$LISTTAR" ]
 				then
 					tar xfP ${foldermymas[$i]}/$CHECKPATH\.tar -C ${foldermymas[$i]}/$CHECKPATH 
-					rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
+					ssh ${hostsmas[$i]} rm $PATHHOST1\.tar 
 					rm ${foldermymas[$i]}/$CHECKPATH\.tar
 				fi 
 				#create empty folders (for full synchro)
-				LISTTMP=$( rsh ${hostsmas[$i]} find $PATHHOST1 -type d )
+				LISTTMP=$( ssh ${hostsmas[$i]} find $PATHHOST1 -type d )
 				LISTTO=""
 				PATHHOSTTMP=$PATHHOST1/
 				for inv in $LISTTMP
@@ -176,7 +176,7 @@ do
 		fi 
 		if [[ `ssh ${hostsmas[$i]} test -d $PATHHOST1 && echo exists` ]] 
 		then 
-			rsh ${hostsmas[$i]} rm $PATHHOST1\.tar 
+			ssh ${hostsmas[$i]} rm $PATHHOST1\.tar 
 			rm ${foldermymas[$i]}/$CHECKPATH\.tar 
 		else 
 			rm ${foldermymas[$i]}/$CHECKPATH 
