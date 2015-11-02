@@ -1,0 +1,42 @@
+myhealth=100
+enemyhealth=100
+packfile=~/pack.file
+timeofch=$( stat -c %y $packfile)
+echo $timeofch
+ipconf="192.168.56.102"
+echo "==============================="
+echo "=  your life      enemy life  ="
+echo "=      100            100     ="
+echo "==============================="
+echo "Write "a" for attack, write "d" for defence"
+while true
+do
+	read action	
+	#enemyrandom=$((( RANDOM % 10 ) + 1 ))
+	#echo $enemyrandom
+	if [ $action = "a" ]
+	then
+	damage=$((( RANDOM % 10 ) + 1 )) 
+	ssh $ipconf "echo $damage > $packfile"
+	#enemydamage=$( expr $enemydamage - $((( RANDOM % 10 ) +1 )) )
+	while true
+	do
+		curtime=$( stat -c %y $packfile )
+		if [[ $timeofch != $curtime ]]
+		then
+			echo $curtime
+			enemydamage=$( ssh $ipconf cat $packfile )
+			timeofch=$( stat -c %y $packfile )
+			enemydam=$( cat $packfile )
+			enemyhealth=$( expr $enemyhealth - $damage )
+			myhealth=$( expr $myhealth - $enemydam )
+			break
+		fi
+	done
+	fi
+	echo "==============================="
+	echo "=  your life      enemy life  ="
+	echo "=       $myhealth            $enemyhealth      ="
+	echo "==============================="
+done
+	
