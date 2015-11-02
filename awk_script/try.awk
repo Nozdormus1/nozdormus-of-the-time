@@ -1,6 +1,6 @@
 #!/bin/bash
 #enter $1 as sensors, $2 as readings
-#for using command print ./doit.awk sensors readings
+#for using command print ./try.awk sensors readings
 #sensors and readings must be in the same folder, or just use full path for them
 #doing some text manipulations
 awk -F"/" '
