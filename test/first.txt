@@ -83,6 +83,7 @@ do
 				damage=$((( RANDOM % 10 ) + 5 ))
 			fi
 			ssh $ipconf "echo $damage > $packfile"
+			echo "You striked for $damage damage!"
 			while true
 			do
 				curtime=$( stat -c %y $packfile )
@@ -93,9 +94,11 @@ do
 					then
 						enemydam=$( cat $packfile )
 						enemyheal=0
+						echo "Enemy striked for $enemydam damage!"
 					else
 						enemydam=0
 						enemyheal=$( cat $packfile )
+						echo "Enemy healed on $enemyheal points!"
 					fi
 					enemyhealth=$( expr $enemyhealth - $damage + $enemyheal )
 					myhealth=$( expr $myhealth - $enemydam )
@@ -106,7 +109,46 @@ do
 		fi
 		if [ $action = "h" ]
 		then
-			heal = 
+			ssh $ipconf "echo 2 > $packfile"
+			while true
+			do
+				curtime=$( stat -c %y $packfile )
+				if [[ $timeofch != $curtime ]]
+				then
+					modifier=$( cat $packfile )
+					break
+				fi
+			done
+			if [ $damc = "2" ]
+			then
+				heal=$((( RANDOM % 6 ) + 5 )) 
+			else
+				heal=$((( RANDOM % 6 ) + 10 ))
+			fi
+			ssh $ipconf "echo $heal > $packfile"
+			echo "You healed on $heal points!"
+			while true
+			do
+				curtime=$( stat -c %y $packfile )
+				if [[ $timeofch != $curtime ]]
+				then
+					timeofch=$( stat -c %y $packfile )
+					if [ $modifier = "1" ]
+					then
+						enemydam=$( cat $packfile )
+						enemyheal=0
+						echo "Enemy striked for $enemydam damage!"
+					else
+						enemydam=0
+						enemyheal=$( cat $packfile )
+						echo "Enemy healed on $enemyheal points!"
+					fi
+					enemyhealth=$( expr $enemyhealth + $enemyheal )
+					myhealth=$( expr $myhealth - $enemydam + $heal )
+					break
+				fi
+			done
+			break
 		fi
 		if [ $action != "a" ] && [ $action != "h" ]
 		then
