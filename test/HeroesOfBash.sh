@@ -1,4 +1,5 @@
 #!/bin/bash
+#to run : enter ./HeroesOfBash.sh IPofAnotherPC and do the same thing on this another PC
 if ! test -e ~/pack.file
 then
 	touch ~/pack.file
